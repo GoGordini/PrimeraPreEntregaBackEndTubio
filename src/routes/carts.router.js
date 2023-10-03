@@ -40,16 +40,18 @@ router.post('/:cid/product/:pid', async (req,res)=>{
     const cartId = Number(req.params.cid);
     const productId = Number(req.params.pid);
     const cartById = carts.find(cart => cart.id === cartId);
+    if (!cartById){ return res.status(400).send({ status: 'error', message: "cart not found" })}; 
     const indexProductInCart = cartById.products.findIndex(product=>product.id===productId);
     console.log("indexProductInCart",indexProductInCart);
     if (indexProductInCart!==-1){
-        cartById.products[indexProductInCart]=cartById.products[indexProductInCart].quantity++;
+        cartById.products[indexProductInCart].quantity++;
     } else {
         cartById.products.push({"id":productId,"quantity":1});
     };
     console.log("cartById",cartById);
     console.log(carts);
     await cartManager.saveCarts(carts);
+    res.status(200).send({ status: 'success', message: "cart updated"});
     } catch(error){
         return res.send({ status: 'error', error: error })
     }   
